@@ -162,8 +162,16 @@ export function StammdatenPage() {
           Zur Übersicht
         </Button>
         <Box sx={{ flexGrow: 1 }} />
-        <Button onClick={handleSpeichern} variant="contained">
+        <Button onClick={handleSpeichern} variant="outlined">
           Speichern
+        </Button>
+        <Button
+          component={RouterLink}
+          to={`/begutachtung/${id}/modul/1`}
+          variant="contained"
+          onClick={() => stammdatenAktualisieren(id, draft)}
+        >
+          Weiter zu Modul 1
         </Button>
       </Stack>
 
