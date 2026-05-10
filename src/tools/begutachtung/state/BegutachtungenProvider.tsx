@@ -5,6 +5,7 @@ import type { BegutachtungenContextValue } from './BegutachtungenContext';
 import { reducer } from './reducer';
 import type { Stammdaten, Begutachtung } from './schema';
 import { ladeAusStorage, speichereInStorage } from './storage';
+import { bauBeispielBegutachtung } from './beispielBegutachtung';
 
 function neueId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -39,6 +40,13 @@ export function BegutachtungenProvider({ children }: { children: ReactNode }) {
   const erstellen = useCallback(() => {
     const id = neueId();
     dispatch({ type: 'erstellen', id, jetzt: jetztIso() });
+    return id;
+  }, []);
+
+  const erstelleBeispiel = useCallback(() => {
+    const id = neueId();
+    const beispiel = bauBeispielBegutachtung(id, jetztIso());
+    dispatch({ type: 'importieren', begutachtungen: [beispiel], modus: 'ergaenzen', jetzt: jetztIso() });
     return id;
   }, []);
 
@@ -80,6 +88,7 @@ export function BegutachtungenProvider({ children }: { children: ReactNode }) {
       begutachtungen: state.begutachtungen,
       finden,
       erstellen,
+      erstelleBeispiel,
       duplizieren,
       loeschen,
       stammdatenAktualisieren,
@@ -90,6 +99,7 @@ export function BegutachtungenProvider({ children }: { children: ReactNode }) {
       state.begutachtungen,
       finden,
       erstellen,
+      erstelleBeispiel,
       duplizieren,
       loeschen,
       stammdatenAktualisieren,

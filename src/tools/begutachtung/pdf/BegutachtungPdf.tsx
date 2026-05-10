@@ -132,11 +132,10 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   // Modulübersicht (Deckblatt-Tabelle)
-  cellModul: { width: '58%' },
-  cellEinzel: { width: '12%', textAlign: 'right' },
-  cellSg: { width: '10%', textAlign: 'center' },
-  cellGewicht: { width: '14%', textAlign: 'right' },
-  cellNotiz: { width: '6%', textAlign: 'center', fontSize: 8, color: colors.muted },
+  cellModul: { width: '60%' },
+  cellEinzel: { width: '13%', textAlign: 'right' },
+  cellSg: { width: '12%', textAlign: 'center' },
+  cellGewicht: { width: '15%', textAlign: 'right' },
   ausgegraut: {
     color: colors.muted,
   },
@@ -299,7 +298,6 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
             <Text style={[styles.cell, styles.cellEinzel]}>EP</Text>
             <Text style={[styles.cell, styles.cellSg]}>SG</Text>
             <Text style={[styles.cell, styles.cellGewicht]}>Gew.</Text>
-            <Text style={[styles.cell, styles.cellNotiz]}> </Text>
           </View>
           {module.map((m, idx) => {
             const ausgegraut = m.ergebnis.fliesstInGesamtwertungEin === false;
@@ -317,9 +315,6 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
                 </Text>
                 <Text style={[styles.cell, styles.cellGewicht, ausgegraut ? styles.ausgegraut : {}]}>
                   {m.ergebnis.gewichtetePunkte}
-                </Text>
-                <Text style={[styles.cell, styles.cellNotiz]}>
-                  {ausgegraut ? '(ohne)' : ''}
                 </Text>
               </View>
             );

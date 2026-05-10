@@ -6,6 +6,7 @@ export type BegutachtungenContextValue = {
   begutachtungen: Begutachtung[];
   finden: (id: string) => Begutachtung | undefined;
   erstellen: () => string;
+  erstelleBeispiel: () => string;
   duplizieren: (id: string) => string | null;
   loeschen: (id: string) => void;
   stammdatenAktualisieren: (id: string, stammdaten: Stammdaten) => void;

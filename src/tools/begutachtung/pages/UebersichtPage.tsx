@@ -19,6 +19,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import AddIcon from '@mui/icons-material/Add';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -37,7 +38,8 @@ import { bezeichnungFuer, downloadDateinameFuer, formatDateTime } from '../utils
 import { downloadAlsDatei, leseDateiAlsText } from '../utils/download';
 
 export function UebersichtPage() {
-  const { begutachtungen, erstellen, loeschen, duplizieren, importieren } = useBegutachtungen();
+  const { begutachtungen, erstellen, erstelleBeispiel, loeschen, duplizieren, importieren } =
+    useBegutachtungen();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [zuLoeschen, setZuLoeschen] = useState<string | null>(null);
@@ -54,6 +56,11 @@ export function UebersichtPage() {
   function handleNeu() {
     const id = erstellen();
     navigate(`/begutachtung/${id}/stammdaten`);
+  }
+
+  function handleBeispiel() {
+    const id = erstelleBeispiel();
+    navigate(`/begutachtung/${id}/abschluss`);
   }
 
   function handleLoeschenBestaetigen() {
@@ -124,7 +131,12 @@ export function UebersichtPage() {
             Alle Daten werden lokal in deinem Browser gespeichert.
           </Typography>
         </Box>
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          <Tooltip title="Erzeugt eine vollständig ausgefüllte Beispiel-Begutachtung (PG 3) zum Ausprobieren.">
+            <Button variant="outlined" startIcon={<AutoAwesomeIcon />} onClick={handleBeispiel}>
+              Beispiel laden
+            </Button>
+          </Tooltip>
           <Button variant="outlined" startIcon={<UploadIcon />} onClick={() => fileInputRef.current?.click()}>
             Importieren
           </Button>
