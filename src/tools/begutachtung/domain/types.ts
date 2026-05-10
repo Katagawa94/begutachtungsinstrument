@@ -16,9 +16,19 @@ export type SkalenStufe = {
   hinweis?: string;
 };
 
+/**
+ * Berechnungsart für Modul-5-Kriterien (Häufigkeit pro Tag/Woche/Monat).
+ * Faktor wirkt jeweils auf die normalisierte Häufigkeit.
+ */
+export type Modul5Berechnung =
+  | { art: 'tagWocheMonat'; faktor: number }
+  | { art: 'monatlich'; faktor: number }
+  | { art: 'zeitTechnik' }
+  | { art: 'jaNein' };
+
 export type KriteriumSkala =
   | { art: 'ordinal'; stufen: SkalenStufe[] }
-  | { art: 'frequenz'; max: number; hinweis: string };
+  | { art: 'frequenz'; max: number; hinweis: string; berechnung: Modul5Berechnung };
 
 export type Kriterium = {
   /** "1.1", "4.13" usw. */
@@ -55,9 +65,22 @@ export type SchweregradBereich = {
   gewichtetePunkte: number;
 };
 
+export type Modul5Frequenz = {
+  /** Anzahl der Maßnahmen pro Tag */
+  tag?: number;
+  /** Anzahl der Maßnahmen pro Woche */
+  woche?: number;
+  /** Anzahl der Maßnahmen pro Monat */
+  monat?: number;
+  /** Ja/Nein-Antwort (z. B. Diät erforderlich) */
+  jaNein?: boolean;
+};
+
 export type Bewertung = {
   wert: number | null;
   kommentar: string;
+  /** Optionale Roh-Häufigkeit für Modul-5-Kriterien; aus ihr wird `wert` abgeleitet. */
+  frequenz?: Modul5Frequenz;
 };
 
 export type Bewertungen = Record<string, Bewertung>;

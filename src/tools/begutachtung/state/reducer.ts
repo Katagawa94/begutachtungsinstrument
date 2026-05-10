@@ -71,16 +71,26 @@ export function reducer(state: State, action: Action): State {
         const neuWert = action.bewertung.wert !== undefined ? action.bewertung.wert : aktuell.wert;
         const neuKommentar =
           action.bewertung.kommentar !== undefined ? action.bewertung.kommentar : aktuell.kommentar;
-        if (neuWert === null && neuKommentar === '') {
+        const neuFrequenz =
+          'frequenz' in action.bewertung ? action.bewertung.frequenz : aktuell.frequenz;
+        const frequenzLeer =
+          !neuFrequenz ||
+          (neuFrequenz.jaNein !== true &&
+            !neuFrequenz.tag &&
+            !neuFrequenz.woche &&
+            !neuFrequenz.monat);
+        if (neuWert === null && neuKommentar === '' && frequenzLeer) {
           const { [action.kriteriumId]: _entfernt, ...rest } = b.bewertungen;
           void _entfernt;
           return { ...b, bewertungen: rest };
         }
+        const naechste: Bewertung = { wert: neuWert, kommentar: neuKommentar };
+        if (!frequenzLeer && neuFrequenz) naechste.frequenz = neuFrequenz;
         return {
           ...b,
           bewertungen: {
             ...b.bewertungen,
-            [action.kriteriumId]: { wert: neuWert, kommentar: neuKommentar },
+            [action.kriteriumId]: naechste,
           },
         };
       });

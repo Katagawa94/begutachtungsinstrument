@@ -95,6 +95,49 @@ describe('reducer', () => {
     expect(next.begutachtungen[0]?.bewertungen).toEqual({});
   });
 
+  it('bewertungSetzen speichert eine Modul-5-Frequenz und behält sie bei Kommentar-Änderung', () => {
+    const a = neueBegutachtung('a', T1);
+    const mitFrequenz = reducer(stateMit(a), {
+      type: 'bewertungSetzen',
+      id: 'a',
+      kriteriumId: '5.1',
+      bewertung: { wert: 3, frequenz: { tag: 3 } },
+      jetzt: T2,
+    });
+    expect(mitFrequenz.begutachtungen[0]?.bewertungen['5.1']).toEqual({
+      wert: 3,
+      kommentar: '',
+      frequenz: { tag: 3 },
+    });
+    const mitKommentar = reducer(mitFrequenz, {
+      type: 'bewertungSetzen',
+      id: 'a',
+      kriteriumId: '5.1',
+      bewertung: { kommentar: 'tägliche Tabletten' },
+      jetzt: T2,
+    });
+    expect(mitKommentar.begutachtungen[0]?.bewertungen['5.1']).toEqual({
+      wert: 3,
+      kommentar: 'tägliche Tabletten',
+      frequenz: { tag: 3 },
+    });
+  });
+
+  it('bewertungSetzen löscht den Eintrag, wenn Wert/Frequenz/Kommentar alle leer sind', () => {
+    const start: Begutachtung = {
+      ...neueBegutachtung('a', T1),
+      bewertungen: { '5.1': { wert: 3, kommentar: '', frequenz: { tag: 3 } } },
+    };
+    const next = reducer(stateMit(start), {
+      type: 'bewertungSetzen',
+      id: 'a',
+      kriteriumId: '5.1',
+      bewertung: { wert: null, frequenz: undefined },
+      jetzt: T2,
+    });
+    expect(next.begutachtungen[0]?.bewertungen).toEqual({});
+  });
+
   it('duplizieren erzeugt eine unabhängige Kopie mit neuer ID', () => {
     const start: Begutachtung = {
       ...neueBegutachtung('a', T1),
