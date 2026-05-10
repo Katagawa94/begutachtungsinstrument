@@ -8,7 +8,6 @@ const colors = {
   muted: '#6b7280',
   border: '#d1d5db',
   rowAlt: '#f9fafb',
-  success: '#15803d',
 };
 
 const styles = StyleSheet.create({
@@ -44,6 +43,12 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: colors.muted,
     marginBottom: 8,
+    lineHeight: 1.4,
+  },
+  legende: {
+    fontSize: 8,
+    color: colors.muted,
+    marginTop: 4,
     lineHeight: 1.4,
   },
   stammdatenGrid: {
@@ -122,54 +127,52 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   cell: {
-    padding: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     fontSize: 10,
   },
-  cellModul: { width: '52%' },
-  cellEinzel: { width: '14%', textAlign: 'right' },
-  cellSg: { width: '12%', textAlign: 'center' },
+  // Modulübersicht (Deckblatt-Tabelle)
+  cellModul: { width: '58%' },
+  cellEinzel: { width: '12%', textAlign: 'right' },
+  cellSg: { width: '10%', textAlign: 'center' },
   cellGewicht: { width: '14%', textAlign: 'right' },
-  cellNotiz: { width: '8%', textAlign: 'center', fontSize: 8, color: colors.muted },
+  cellNotiz: { width: '6%', textAlign: 'center', fontSize: 8, color: colors.muted },
   ausgegraut: {
     color: colors.muted,
   },
+  // Modul-Seiten (Kriterien-Tabelle)
   kriteriumZeile: {
     flexDirection: 'row',
     paddingVertical: 5,
+    paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   kriteriumId: {
-    width: '8%',
+    width: '10%',
     fontFamily: 'Helvetica-Bold',
     fontSize: 9,
+    paddingRight: 6,
   },
   kriteriumName: {
-    width: '40%',
-    paddingRight: 6,
+    width: '50%',
+    paddingRight: 8,
     fontSize: 10,
   },
   kriteriumWert: {
-    width: '22%',
+    width: '28%',
+    paddingRight: 8,
     fontSize: 9,
   },
   kriteriumPunkte: {
-    width: '10%',
+    width: '12%',
     fontSize: 9,
     textAlign: 'right',
-  },
-  kriteriumKommentar: {
-    width: '20%',
-    fontSize: 8,
-    color: colors.muted,
-  },
-  kriteriumKommentarText: {
-    fontStyle: 'italic',
   },
   modulSubtotal: {
     flexDirection: 'row',
     paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
     borderTopWidth: 1,
     borderTopColor: colors.primary,
     backgroundColor: colors.rowAlt,
@@ -184,13 +187,34 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginLeft: 16,
   },
+  // Kommentare (unter der Modul-Tabelle)
+  kommentareTitel: {
+    fontSize: 11,
+    fontFamily: 'Helvetica-Bold',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  kommentarBlock: {
+    marginBottom: 6,
+  },
+  kommentarKopf: {
+    fontSize: 9,
+    fontFamily: 'Helvetica-Bold',
+  },
+  kommentarText: {
+    fontSize: 9,
+    fontStyle: 'italic',
+    color: colors.muted,
+    lineHeight: 1.4,
+    marginTop: 1,
+  },
   footer: {
     position: 'absolute',
     bottom: 24,
     left: 48,
     right: 48,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     fontSize: 8,
     color: colors.muted,
     paddingTop: 6,
@@ -211,17 +235,13 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: colors.muted,
   },
-  pageBreak: {
-    pageBreakBefore: true,
-  },
 });
 
 type DocProps = { data: PdfData };
 
 export function BegutachtungPdfDocument({ data }: DocProps) {
-  const { begutachtung, ergebnis, module, erstelltAm } = data;
+  const { begutachtung, ergebnis, module } = data;
   const { stammdaten } = begutachtung;
-  const erstelltAmFmt = formatDate(erstelltAm);
   const personenname = stammdaten.person.name.trim() || 'Begutachtete Person';
 
   return (
@@ -268,9 +288,7 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
           </View>
           <View style={styles.ergebnisRechts}>
             <Text style={styles.ergebnisRechtsZeile}>{ergebnis.pflegegradBezeichnung}</Text>
-            <Text style={styles.ergebnisRechtsZeile}>
-              Schwellen § 15 SGB XI: PG 1 ab 12,5 · PG 2 ab 27 · PG 3 ab 47,5 · PG 4 ab 70 · PG 5 ab 90
-            </Text>
+            <Text style={styles.ergebnisRechtsZeile}>Schwellen nach § 15 SGB XI</Text>
           </View>
         </View>
 
@@ -278,9 +296,9 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
         <View style={styles.table}>
           <View style={[styles.tableRow, styles.tableHeader]}>
             <Text style={[styles.cell, styles.cellModul]}>Modul</Text>
-            <Text style={[styles.cell, styles.cellEinzel]}>Einzelpunkte</Text>
+            <Text style={[styles.cell, styles.cellEinzel]}>EP</Text>
             <Text style={[styles.cell, styles.cellSg]}>SG</Text>
-            <Text style={[styles.cell, styles.cellGewicht]}>Gewichtet</Text>
+            <Text style={[styles.cell, styles.cellGewicht]}>Gew.</Text>
             <Text style={[styles.cell, styles.cellNotiz]}> </Text>
           </View>
           {module.map((m, idx) => {
@@ -288,14 +306,8 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
             const istLetzte = idx === module.length - 1;
             return (
               <View key={m.id} style={istLetzte ? styles.tableRowLast : styles.tableRow}>
-                <Text
-                  style={[
-                    styles.cell,
-                    styles.cellModul,
-                    ausgegraut ? styles.ausgegraut : {},
-                  ]}
-                >
-                  Modul {m.id} — {m.name} ({m.gewichtungProzent} %)
+                <Text style={[styles.cell, styles.cellModul, ausgegraut ? styles.ausgegraut : {}]}>
+                  {m.name} ({m.gewichtungProzent} %)
                 </Text>
                 <Text style={[styles.cell, styles.cellEinzel, ausgegraut ? styles.ausgegraut : {}]}>
                   {m.ergebnis.einzelpunkte}
@@ -303,9 +315,7 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
                 <Text style={[styles.cell, styles.cellSg, ausgegraut ? styles.ausgegraut : {}]}>
                   {m.ergebnis.schweregrad}
                 </Text>
-                <Text
-                  style={[styles.cell, styles.cellGewicht, ausgegraut ? styles.ausgegraut : {}]}
-                >
+                <Text style={[styles.cell, styles.cellGewicht, ausgegraut ? styles.ausgegraut : {}]}>
                   {m.ergebnis.gewichtetePunkte}
                 </Text>
                 <Text style={[styles.cell, styles.cellNotiz]}>
@@ -315,16 +325,20 @@ export function BegutachtungPdfDocument({ data }: DocProps) {
             );
           })}
         </View>
-        <Text style={[styles.modulHinweis, { marginTop: 4 }]}>
+        <Text style={styles.legende}>
+          EP = Summe der Einzelpunkte im Modul · SG = Schweregrad (0–4) nach Anlage 2 SGB XI ·
+          Gew. = gewichtete Punkte des Moduls (fließen in die Gesamtsumme ein).
+        </Text>
+        <Text style={styles.modulHinweis}>
           Hinweis: Bei Modul 2 und Modul 3 fließt nur der höhere gewichtete Punktwert in die
           Gesamtsumme ein (§ 15 SGB XI). Die nicht gewertete Zeile ist hellgrau dargestellt.
         </Text>
 
-        <PdfFooter erstelltAm={erstelltAmFmt} />
+        <PdfFooter />
       </Page>
 
       {module.map((m) => (
-        <ModulSeite key={m.id} modul={m} erstelltAm={erstelltAmFmt} />
+        <ModulSeite key={m.id} modul={m} />
       ))}
     </Document>
   );
@@ -339,7 +353,8 @@ function Stammfeld({ label, wert }: { label: string; wert: string }) {
   );
 }
 
-function ModulSeite({ modul, erstelltAm }: { modul: PdfModul; erstelltAm: string }) {
+function ModulSeite({ modul }: { modul: PdfModul }) {
+  const kommentare = modul.kriterien.filter((k) => k.kommentar.trim().length > 0);
   return (
     <Page size="A4" style={styles.page} wrap>
       <View style={styles.header} fixed>
@@ -356,11 +371,10 @@ function ModulSeite({ modul, erstelltAm }: { modul: PdfModul; erstelltAm: string
 
       <View style={styles.table}>
         <View style={[styles.kriteriumZeile, styles.tableHeader]} fixed>
-          <Text style={[styles.kriteriumId, { fontSize: 9 }]}>Nr.</Text>
+          <Text style={styles.kriteriumId}>Nr.</Text>
           <Text style={styles.kriteriumName}>Kriterium</Text>
           <Text style={styles.kriteriumWert}>Bewertung</Text>
           <Text style={styles.kriteriumPunkte}>Punkte</Text>
-          <Text style={styles.kriteriumKommentar}>Kommentar</Text>
         </View>
         {modul.kriterien.map((k) => (
           <KriteriumZeile key={k.id} k={k} />
@@ -375,7 +389,21 @@ function ModulSeite({ modul, erstelltAm }: { modul: PdfModul; erstelltAm: string
         <Text style={styles.subtotalWert}>{modul.ergebnis.gewichtetePunkte} gew. P.</Text>
       </View>
 
-      <PdfFooter erstelltAm={erstelltAm} />
+      {kommentare.length > 0 ? (
+        <View>
+          <Text style={styles.kommentareTitel}>Kommentare</Text>
+          {kommentare.map((k) => (
+            <View key={k.id} style={styles.kommentarBlock} wrap={false}>
+              <Text style={styles.kommentarKopf}>
+                {k.id} — {k.bezeichnung}
+              </Text>
+              <Text style={styles.kommentarText}>{k.kommentar}</Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      <PdfFooter />
     </Page>
   );
 }
@@ -390,29 +418,19 @@ function KriteriumZeile({ k }: { k: PdfKriterium }) {
         {k.faktor !== 1 ? ` (×${k.faktor})` : ''}
       </Text>
       <Text style={[styles.kriteriumWert, nichtBewertet ? styles.ausgegraut : {}]}>
-        {nichtBewertet
-          ? 'nicht bewertet'
-          : `${k.wert} – ${k.wertLabel}`}
+        {nichtBewertet ? 'nicht bewertet' : `${k.wert} – ${k.wertLabel}`}
       </Text>
       <Text style={[styles.kriteriumPunkte, nichtBewertet ? styles.ausgegraut : {}]}>
         {nichtBewertet ? '–' : k.punkte}
-      </Text>
-      <Text style={[styles.kriteriumKommentar, k.kommentar ? styles.kriteriumKommentarText : {}]}>
-        {k.kommentar || ''}
       </Text>
     </View>
   );
 }
 
-function PdfFooter({ erstelltAm }: { erstelltAm: string }) {
+function PdfFooter() {
   return (
     <View style={styles.footer} fixed>
-      <Text>
-        Erstellt am {erstelltAm} mit dem Pflegesachverständigen-Hub · alle Daten lokal im Browser
-      </Text>
-      <Text
-        render={({ pageNumber, totalPages }) => `Seite ${pageNumber} / ${totalPages}`}
-      />
+      <Text render={({ pageNumber, totalPages }) => `Seite ${pageNumber} / ${totalPages}`} />
     </View>
   );
 }
