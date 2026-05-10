@@ -24,6 +24,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import EditIcon from '@mui/icons-material/Edit';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { downloadBegutachtungPdf } from '../pdf/download';
 import { useBegutachtungen } from '../state/useBegutachtungen';
 import {
   exportiereAlleAlsJson,
@@ -72,6 +74,17 @@ export function UebersichtPage() {
     const b = begutachtungen.find((x) => x.id === id);
     if (!b) return;
     downloadAlsDatei(exportiereAlsJson(b), downloadDateinameFuer(b));
+  }
+
+  async function handlePdfEinzeln(id: string) {
+    const b = begutachtungen.find((x) => x.id === id);
+    if (!b) return;
+    try {
+      await downloadBegutachtungPdf(b);
+    } catch (e) {
+      const text = e instanceof Error ? e.message : 'Unbekannter Fehler';
+      setMeldung({ schwere: 'error', text: `PDF-Erstellung fehlgeschlagen: ${text}` });
+    }
   }
 
   function handleExportAlle() {
@@ -183,6 +196,11 @@ export function UebersichtPage() {
                   >
                     Bearbeiten
                   </Button>
+                  <Tooltip title="Als PDF herunterladen">
+                    <IconButton aria-label="PDF" onClick={() => handlePdfEinzeln(b.id)}>
+                      <PictureAsPdfIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Als JSON exportieren">
                     <IconButton aria-label="exportieren" onClick={() => handleExportEinzeln(b.id)}>
                       <DownloadIcon />
