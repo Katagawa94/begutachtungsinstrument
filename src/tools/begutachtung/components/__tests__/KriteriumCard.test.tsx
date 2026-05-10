@@ -43,7 +43,7 @@ describe('KriteriumCard', () => {
     expect(onChange).toHaveBeenCalledWith({ kommentar: 'X' });
   });
 
-  it('begrenzt Frequenzeingabe auf den Maximalwert des Kriteriums', async () => {
+  it('berechnet Modul-5-Punkte aus der Häufigkeit und deckelt auf max', async () => {
     const onChange = vi.fn();
     render(
       <KriteriumCard
@@ -52,10 +52,37 @@ describe('KriteriumCard', () => {
         onChange={onChange}
       />,
     );
-    const input = screen.getByRole('spinbutton');
-    await userEvent.type(input, '99');
-    // Das Kriterium 5.13 ist auf max 4 beschränkt – die letzte Auswertung clampt.
+    const monatInput = screen.getByLabelText(/Pro Monat/i);
+    // Mit nicht-aufgehobener Eingabe wird jeder Keystroke einzeln verarbeitet —
+    // wir prüfen daher nur den Clamp-Effekt: 9 (× 1) → clamped auf 4.
+    await userEvent.type(monatInput, '9');
     const letzte = onChange.mock.calls.at(-1)?.[0];
-    expect(letzte).toEqual({ wert: 4 });
+    expect(letzte).toEqual({ wert: 4, frequenz: { monat: 9 } });
+  });
+
+  it('zeigt drei Häufigkeits-Felder für Standard-Modul-5-Kriterien', () => {
+    render(
+      <KriteriumCard
+        kriterium={getKriterium('5.1')}
+        bewertung={undefined}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByLabelText(/Pro Tag/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Pro Woche/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Pro Monat/i)).toBeInTheDocument();
+  });
+
+  it('zeigt einen Ja/Nein-Schalter für Diät-Kriterium 5.16', () => {
+    const onChange = vi.fn();
+    render(
+      <KriteriumCard
+        kriterium={getKriterium('5.16')}
+        bewertung={undefined}
+        onChange={onChange}
+      />,
+    );
+    const schalter = screen.getByRole('checkbox', { name: /Erforderlich/i });
+    expect(schalter).toBeInTheDocument();
   });
 });

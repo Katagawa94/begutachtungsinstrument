@@ -1,5 +1,5 @@
 import { KRITERIEN_BESCHREIBUNGEN } from './kriterienBeschreibungen';
-import type { Kriterium, Modul, SkalenStufe } from './types';
+import type { Kriterium, Modul, Modul5Berechnung, SkalenStufe } from './types';
 
 const STUFEN_SELBSTSTAENDIGKEIT: SkalenStufe[] = [
   { wert: 0, label: 'selbstständig' },
@@ -150,15 +150,39 @@ const MODUL_4: Modul = {
   ],
 };
 
-const FREQUENZ_HINWEIS =
-  'Eingabe als Punktwert nach Begutachtungsrichtlinien (Häufigkeit pro Tag/Woche/Monat × kriterienspezifischer Faktor). Frequenzrechner folgt im UI.';
+const FREQUENZ_HINWEIS_STANDARD =
+  'Häufigkeit pro Tag, Woche und Monat eintragen — die Punkte werden aus dem Tagesäquivalent (Tag + Woche/7 + Monat/30) berechnet.';
+const FREQUENZ_HINWEIS_MONATLICH =
+  'Anzahl pro Monat eintragen.';
+const FREQUENZ_HINWEIS_ZEITTECHNIK =
+  'Häufigkeit pro Tag, Woche und Monat eintragen. Tägliche Maßnahmen ergeben den Maximalwert von 60 Punkten.';
+const FREQUENZ_HINWEIS_JANEIN =
+  'Liegt eine entsprechende ärztliche Verordnung vor?';
 
-function frequenzKriterium(id: string, bezeichnung: string, max: number): Kriterium {
+function hinweisFuer(berechnung: Modul5Berechnung): string {
+  switch (berechnung.art) {
+    case 'tagWocheMonat':
+      return FREQUENZ_HINWEIS_STANDARD;
+    case 'monatlich':
+      return FREQUENZ_HINWEIS_MONATLICH;
+    case 'zeitTechnik':
+      return FREQUENZ_HINWEIS_ZEITTECHNIK;
+    case 'jaNein':
+      return FREQUENZ_HINWEIS_JANEIN;
+  }
+}
+
+function frequenzKriterium(
+  id: string,
+  bezeichnung: string,
+  max: number,
+  berechnung: Modul5Berechnung,
+): Kriterium {
   return {
     id,
     modulId: 5,
     bezeichnung,
-    skala: { art: 'frequenz', max, hinweis: FREQUENZ_HINWEIS },
+    skala: { art: 'frequenz', max, hinweis: hinweisFuer(berechnung), berechnung },
   };
 }
 
@@ -169,24 +193,31 @@ const MODUL_5: Modul = {
   einleitung:
     'Wie selbstständig kann die begutachtete Person mit ärztlich angeordneten, voraussichtlich mindestens sechs Monate erforderlichen Maßnahmen umgehen? Bewertet wird die Häufigkeit notwendiger Hilfen.',
   maxEinzelpunkte: 100,
-  kriterien: [
-    frequenzKriterium('5.1', 'Medikation', 30),
-    frequenzKriterium('5.2', 'Injektionen / subkutane Infusionen', 30),
-    frequenzKriterium('5.3', 'Versorgung intravenöser Zugänge (z. B. Port)', 30),
-    frequenzKriterium('5.4', 'Absaugen und Sauerstoffgabe', 30),
-    frequenzKriterium('5.5', 'Einreibungen sowie Kälte- und Wärmeanwendungen', 30),
-    frequenzKriterium('5.6', 'Messung und Deutung von Körperzuständen (z. B. Blutdruck, Blutzucker)', 30),
-    frequenzKriterium('5.7', 'Körpernahe Hilfsmittel (z. B. Bandagen, Kompressionsstrümpfe)', 30),
-    frequenzKriterium('5.8', 'Verbandwechsel und Wundversorgung', 30),
-    frequenzKriterium('5.9', 'Versorgung mit Stoma', 30),
-    frequenzKriterium('5.10', 'Regelmäßige Einmalkatheterisierung und Nutzung von Abführmethoden', 30),
-    frequenzKriterium('5.11', 'Therapiemaßnahmen in häuslicher Umgebung', 30),
-    frequenzKriterium('5.12', 'Zeit- und technikintensive Maßnahmen in häuslicher Umgebung', 60),
-    frequenzKriterium('5.13', 'Arztbesuche', 4),
-    frequenzKriterium('5.14', 'Besuch anderer medizinischer oder therapeutischer Einrichtungen (bis 3 Stunden)', 4),
-    frequenzKriterium('5.15', 'Zeitlich ausgedehnte Besuche medizinischer oder therapeutischer Einrichtungen (länger als 3 Stunden)', 4),
-    frequenzKriterium('5.16', 'Einhalten einer Diät oder anderer krankheits- oder therapiebedingter Verhaltensvorschriften', 1),
-  ],
+  kriterien: (() => {
+    const STD: Modul5Berechnung = { art: 'tagWocheMonat', faktor: 1 };
+    const MONATLICH_X1: Modul5Berechnung = { art: 'monatlich', faktor: 1 };
+    const MONATLICH_X2: Modul5Berechnung = { art: 'monatlich', faktor: 2 };
+    const ZEIT_TECH: Modul5Berechnung = { art: 'zeitTechnik' };
+    const JA_NEIN: Modul5Berechnung = { art: 'jaNein' };
+    return [
+      frequenzKriterium('5.1', 'Medikation', 30, STD),
+      frequenzKriterium('5.2', 'Injektionen / subkutane Infusionen', 30, STD),
+      frequenzKriterium('5.3', 'Versorgung intravenöser Zugänge (z. B. Port)', 30, STD),
+      frequenzKriterium('5.4', 'Absaugen und Sauerstoffgabe', 30, STD),
+      frequenzKriterium('5.5', 'Einreibungen sowie Kälte- und Wärmeanwendungen', 30, STD),
+      frequenzKriterium('5.6', 'Messung und Deutung von Körperzuständen (z. B. Blutdruck, Blutzucker)', 30, STD),
+      frequenzKriterium('5.7', 'Körpernahe Hilfsmittel (z. B. Bandagen, Kompressionsstrümpfe)', 30, STD),
+      frequenzKriterium('5.8', 'Verbandwechsel und Wundversorgung', 30, STD),
+      frequenzKriterium('5.9', 'Versorgung mit Stoma', 30, STD),
+      frequenzKriterium('5.10', 'Regelmäßige Einmalkatheterisierung und Nutzung von Abführmethoden', 30, STD),
+      frequenzKriterium('5.11', 'Therapiemaßnahmen in häuslicher Umgebung', 30, STD),
+      frequenzKriterium('5.12', 'Zeit- und technikintensive Maßnahmen in häuslicher Umgebung', 60, ZEIT_TECH),
+      frequenzKriterium('5.13', 'Arztbesuche', 4, MONATLICH_X1),
+      frequenzKriterium('5.14', 'Besuch anderer medizinischer oder therapeutischer Einrichtungen (bis 3 Stunden)', 4, MONATLICH_X1),
+      frequenzKriterium('5.15', 'Zeitlich ausgedehnte Besuche medizinischer oder therapeutischer Einrichtungen (länger als 3 Stunden)', 8, MONATLICH_X2),
+      frequenzKriterium('5.16', 'Einhalten einer Diät oder anderer krankheits- oder therapiebedingter Verhaltensvorschriften', 1, JA_NEIN),
+    ];
+  })(),
   schweregradBereiche: [
     { schweregrad: 0, bezeichnung: 'keine Beeinträchtigung', von: 0, bis: 0, gewichtetePunkte: 0 },
     { schweregrad: 1, bezeichnung: 'geringe Beeinträchtigung', von: 1, bis: 1, gewichtetePunkte: 5 },

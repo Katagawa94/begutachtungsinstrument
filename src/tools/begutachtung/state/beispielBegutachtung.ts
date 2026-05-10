@@ -66,9 +66,17 @@ export function bauBeispielBegutachtung(id: string, jetztIso: string): Begutacht
     '4.12': k(0),
     '4.13': k(0),
 
-    // Modul 5 — Krankheits-/therapiebedingte Anforderungen (Summe 4 → SG 3 → 15 gew. P.)
-    '5.1': k(4, 'Drei orale Medikamente morgens, eines abends. Stellen erfolgt durch Tochter.'),
-    '5.6': k(0),
+    // Modul 5 — Krankheits-/therapiebedingte Anforderungen (Summe 5 → SG 3 → 15 gew. P.)
+    '5.1': {
+      wert: 4,
+      kommentar: 'Drei orale Medikamente morgens, eines abends. Stellen erfolgt durch Tochter.',
+      frequenz: { tag: 4 },
+    },
+    '5.16': {
+      wert: 1,
+      kommentar: 'Salzarme Diät bei Hypertonie.',
+      frequenz: { jaNein: true },
+    },
 
     // Modul 6 — Gestaltung des Alltagslebens und sozialer Kontakte (Summe 4 → SG 2 → 7,5 gew. P.)
     '6.1': k(1),

@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useMemo } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
@@ -9,8 +9,17 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import ClearIcon from '@mui/icons-material/Clear';
-import type { Bewertung, Kriterium, SkalenStufe } from '../domain/types';
+import type {
+  Bewertung,
+  Kriterium,
+  Modul5Berechnung,
+  Modul5Frequenz,
+  SkalenStufe,
+} from '../domain/types';
+import { berechneModul5Punkte, istLeere } from '../domain/modul5Berechnung';
 
 type Props = {
   kriterium: Kriterium;
@@ -57,12 +66,27 @@ export function KriteriumCard({ kriterium, bewertung, onChange }: Props) {
               onChange={(v) => onChange({ wert: v })}
             />
           ) : (
-            <FrequenzEingabe
+            <Modul5Kalkulator
               labelId={labelId}
-              wert={wert}
               max={kriterium.skala.max}
               hinweis={kriterium.skala.hinweis}
-              onChange={(v) => onChange({ wert: v })}
+              berechnung={kriterium.skala.berechnung}
+              frequenz={bewertung?.frequenz}
+              wert={wert}
+              onChange={(naechsteFrequenz) => {
+                if (naechsteFrequenz === null) {
+                  onChange({ wert: null, frequenz: undefined });
+                  return;
+                }
+                const punkte = berechneModul5Punkte(
+                  kriterium.skala.art === 'frequenz'
+                    ? kriterium.skala.berechnung
+                    : { art: 'tagWocheMonat', faktor: 1 },
+                  kriterium.skala.art === 'frequenz' ? kriterium.skala.max : 0,
+                  naechsteFrequenz,
+                );
+                onChange({ wert: punkte, frequenz: naechsteFrequenz });
+              }}
             />
           )}
 
@@ -155,55 +179,152 @@ function OrdinalAuswahl({
   );
 }
 
-function FrequenzEingabe({
-  labelId,
-  wert,
-  max,
-  hinweis,
-  onChange,
-}: {
+type KalkulatorProps = {
   labelId: string;
-  wert: number | null;
   max: number;
   hinweis: string;
-  onChange: (wert: number | null) => void;
+  berechnung: Modul5Berechnung;
+  frequenz: Modul5Frequenz | undefined;
+  wert: number | null;
+  onChange: (naechste: Modul5Frequenz | null) => void;
+};
+
+function Modul5Kalkulator({
+  labelId,
+  max,
+  hinweis,
+  berechnung,
+  frequenz,
+  wert,
+  onChange,
+}: KalkulatorProps) {
+  const eingabeLeer = istLeere(frequenz);
+  const punkteLabel = useMemo(() => {
+    if (eingabeLeer || wert === null) return 'nicht bewertet';
+    const einheit = wert === 1 ? 'Punkt' : 'Punkte';
+    return `${wert} ${einheit}`;
+  }, [eingabeLeer, wert]);
+
+  function setze(patch: Partial<Modul5Frequenz>) {
+    const naechste: Modul5Frequenz = { ...(frequenz ?? {}), ...patch };
+    if (istLeere(naechste)) {
+      onChange(null);
+      return;
+    }
+    onChange(naechste);
+  }
+
+  return (
+    <Stack spacing={1.5} aria-labelledby={labelId}>
+      {berechnung.art === 'jaNein' ? (
+        <FormControlLabel
+          control={
+            <Switch
+              checked={Boolean(frequenz?.jaNein)}
+              onChange={(_e, checked) => onChange(checked ? { jaNein: true } : null)}
+            />
+          }
+          label="Erforderlich"
+        />
+      ) : berechnung.art === 'monatlich' ? (
+        <ZahlEingabe
+          label="Pro Monat"
+          value={frequenz?.monat}
+          max={300}
+          onChange={(monat) => setze({ monat })}
+        />
+      ) : (
+        <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+          <ZahlEingabe
+            label="Pro Tag"
+            value={frequenz?.tag}
+            max={50}
+            onChange={(tag) => setze({ tag })}
+          />
+          <ZahlEingabe
+            label="Pro Woche"
+            value={frequenz?.woche}
+            max={50}
+            onChange={(woche) => setze({ woche })}
+          />
+          <ZahlEingabe
+            label="Pro Monat"
+            value={frequenz?.monat}
+            max={300}
+            onChange={(monat) => setze({ monat })}
+          />
+        </Stack>
+      )}
+
+      <Stack direction="row" spacing={1.5} alignItems="center" useFlexGap flexWrap="wrap">
+        <Box
+          sx={{
+            px: 1.5,
+            py: 0.75,
+            borderRadius: 1,
+            bgcolor: eingabeLeer ? 'action.hover' : 'primary.main',
+            color: eingabeLeer ? 'text.secondary' : 'primary.contrastText',
+            fontWeight: 600,
+            fontSize: 14,
+            transition: 'background-color 150ms ease, color 150ms ease',
+          }}
+        >
+          {punkteLabel}
+          {!eingabeLeer && wert !== null && wert >= max ? (
+            <Typography component="span" variant="caption" sx={{ ml: 0.75, opacity: 0.85 }}>
+              (max)
+            </Typography>
+          ) : null}
+        </Box>
+        <Typography variant="caption" color="text.secondary" sx={{ flexGrow: 1 }}>
+          {hinweis}
+        </Typography>
+        {!eingabeLeer ? (
+          <Tooltip title="Eingabe zurücksetzen">
+            <IconButton
+              size="small"
+              aria-label="Eingabe zurücksetzen"
+              onClick={() => onChange(null)}
+            >
+              <ClearIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : null}
+      </Stack>
+    </Stack>
+  );
+}
+
+function ZahlEingabe({
+  label,
+  value,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: number | undefined;
+  max: number;
+  onChange: (wert: number | undefined) => void;
 }) {
   return (
-    <Stack spacing={1}>
-      <Stack direction="row" spacing={2} alignItems="center" useFlexGap>
-        <TextField
-          type="number"
-          size="small"
-          slotProps={{
-            input: { inputProps: { min: 0, max, step: 1, 'aria-labelledby': labelId } },
-          }}
-          sx={{ maxWidth: 200 }}
-          value={wert ?? ''}
-          onChange={(e) => {
-            const raw = e.target.value;
-            if (raw === '') {
-              onChange(null);
-              return;
-            }
-            const zahl = Number(raw);
-            if (Number.isNaN(zahl)) return;
-            const begrenzt = Math.max(0, Math.min(max, Math.round(zahl)));
-            onChange(begrenzt);
-          }}
-          helperText={`Punktwert (0–${max})`}
-          label="Einzelpunkte"
-        />
-        <Typography
-          variant="body2"
-          color={wert === null ? 'text.secondary' : 'text.primary'}
-          sx={{ fontStyle: wert === null ? 'italic' : 'normal' }}
-        >
-          {wert === null ? 'nicht bewertet' : `${wert} Punkte`}
-        </Typography>
-      </Stack>
-      <Typography variant="caption" color="text.secondary">
-        {hinweis}
-      </Typography>
-    </Stack>
+    <TextField
+      type="number"
+      label={label}
+      size="small"
+      sx={{ width: 130 }}
+      slotProps={{ input: { inputProps: { min: 0, max, step: 1 } } }}
+      value={value ?? ''}
+      onChange={(e) => {
+        const raw = e.target.value;
+        if (raw === '') {
+          onChange(undefined);
+          return;
+        }
+        const zahl = Number(raw);
+        if (Number.isNaN(zahl)) return;
+        const begrenzt = Math.max(0, Math.min(max, Math.round(zahl)));
+        onChange(begrenzt);
+      }}
+    />
   );
 }
