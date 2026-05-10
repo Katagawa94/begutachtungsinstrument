@@ -24,11 +24,13 @@ type Props = {
   stammdatenVollstaendig: boolean;
 };
 
+const ICON_SIZE = 30;
+
 const Connector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 14,
-    left: 'calc(-50% + 18px)',
-    right: 'calc(50% + 18px)',
+    top: ICON_SIZE / 2 - 1, // mittig auf den Step-Icons
+    left: `calc(-50% + ${ICON_SIZE / 2 + 4}px)`,
+    right: `calc(50% + ${ICON_SIZE / 2 + 4}px)`,
   },
   [`&.${stepConnectorClasses.active} .${stepConnectorClasses.line}`]: {
     backgroundImage: `linear-gradient(90deg, ${theme.palette.success.main} 0%, ${theme.palette.primary.main} 100%)`,
@@ -50,15 +52,16 @@ const StepIconRoot = styled('div', {
   shouldForwardProp: (prop) => prop !== 'ownerActive' && prop !== 'ownerCompleted',
 })<{ ownerActive: boolean; ownerCompleted: boolean }>(
   ({ theme, ownerActive, ownerCompleted }) => ({
-    width: 30,
-    height: 30,
+    width: ICON_SIZE,
+    height: ICON_SIZE,
+    boxSizing: 'border-box',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: 700,
     fontSize: 13,
-    transition: 'all 180ms ease',
+    transition: 'background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease',
     color: theme.palette.text.secondary,
     backgroundColor:
       theme.palette.mode === 'dark' ? alpha(theme.palette.text.primary, 0.08) : '#fff',
@@ -71,12 +74,10 @@ const StepIconRoot = styled('div', {
       color: theme.palette.success.contrastText,
     }),
     ...(ownerActive && {
-      width: 36,
-      height: 36,
       backgroundColor: theme.palette.primary.main,
       borderColor: theme.palette.primary.main,
       color: theme.palette.primary.contrastText,
-      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.2)}`,
+      boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.22)}`,
     }),
   }),
 );
@@ -133,7 +134,7 @@ export function FortschrittStepper({
           const erledigt = istErledigt(step);
           return (
             <Step key={step.pfad} completed={erledigt}>
-              <StepButton onClick={() => navigate(step.pfad)} sx={{ py: 0.5 }}>
+              <StepButton onClick={() => navigate(step.pfad)}>
                 <StepLabel
                   slots={{ stepIcon: makeStepIcon(step) }}
                   sx={{
