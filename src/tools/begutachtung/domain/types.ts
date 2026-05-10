@@ -25,6 +25,8 @@ export type Kriterium = {
   id: string;
   modulId: ModulId;
   bezeichnung: string;
+  /** Beschreibung des bewerteten Themas, paraphrasiert nach den Begutachtungs-Richtlinien. */
+  beschreibung?: string;
   skala: KriteriumSkala;
   /** Multiplikator beim Bilden der Modul-Einzelpunkt-Summe. Standard: 1. */
   faktor?: number;
