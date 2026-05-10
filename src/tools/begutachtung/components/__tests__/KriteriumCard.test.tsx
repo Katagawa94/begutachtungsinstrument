@@ -5,6 +5,22 @@ import { KriteriumCard } from '../KriteriumCard';
 import { getKriterium } from '../../domain/modules';
 
 describe('KriteriumCard', () => {
+  it('zeigt die offizielle Themen-Beschreibung des Kriteriums an', () => {
+    render(<KriteriumCard kriterium={getKriterium('1.1')} bewertung={undefined} onChange={vi.fn()} />);
+    expect(screen.getByText(/Liegeposition im Bett/i)).toBeInTheDocument();
+  });
+
+  it('zeigt nach der Auswahl das offizielle Stufen-Label neben den Buttons', () => {
+    render(
+      <KriteriumCard
+        kriterium={getKriterium('1.1')}
+        bewertung={{ wert: 2, kommentar: '' }}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/überwiegend unselbstständig/i)).toBeInTheDocument();
+  });
+
   it('ruft onChange mit dem ausgewählten ordinalen Wert auf', async () => {
     const onChange = vi.fn();
     render(<KriteriumCard kriterium={getKriterium('1.1')} bewertung={undefined} onChange={onChange} />);

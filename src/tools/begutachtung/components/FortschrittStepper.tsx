@@ -47,12 +47,12 @@ export function FortschrittStepper({
           position: 'relative',
         }}
       >
-        {/* Verbindungslinie hinter den Punkten */}
+        {/* Verbindungslinie hinter den Punkten – mittig auf der 40-px-Kreisreihe */}
         <Box
           aria-hidden
           sx={{
             position: 'absolute',
-            top: 16,
+            top: 19,
             left: 16,
             right: 16,
             height: 2,
@@ -82,42 +82,53 @@ export function FortschrittStepper({
                 minWidth: 0,
               }}
             >
-              <Tooltip title={step.label} placement="top">
-                <Box
-                  component="button"
-                  type="button"
-                  aria-label={`Springe zu ${step.label}`}
-                  aria-current={aktiv ? 'step' : undefined}
-                  onClick={() => navigate(step.pfad)}
-                  sx={{
-                    cursor: 'pointer',
-                    border: 'none',
-                    p: 0,
-                    bgcolor: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: aktiv ? 40 : 28,
-                    height: aktiv ? 40 : 28,
-                    borderRadius: '50%',
-                    color: aktiv || erledigt ? '#fff' : theme.palette.text.secondary,
-                    backgroundColor: farbe,
-                    transition: 'all 120ms ease-in-out',
-                    fontSize: aktiv ? 14 : 12,
-                    fontWeight: 600,
-                    boxShadow: aktiv ? 4 : 0,
-                    '&:hover': {
-                      filter: 'brightness(1.05)',
-                    },
-                    '&:focus-visible': {
-                      outline: `2px solid ${theme.palette.primary.main}`,
-                      outlineOffset: 2,
-                    },
-                  }}
-                >
-                  {erledigt && !aktiv ? <CheckIcon fontSize="small" /> : kurzInhalt(step)}
-                </Box>
-              </Tooltip>
+              <Box
+                sx={{
+                  // Fixe Höhe für die Kreis-Reihe, damit der aktive (größere) Punkt das Layout
+                  // darunter nicht verschiebt.
+                  height: 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Tooltip title={step.label} placement="top">
+                  <Box
+                    component="button"
+                    type="button"
+                    aria-label={`Springe zu ${step.label}`}
+                    aria-current={aktiv ? 'step' : undefined}
+                    onClick={() => navigate(step.pfad)}
+                    sx={{
+                      cursor: 'pointer',
+                      border: 'none',
+                      p: 0,
+                      bgcolor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: aktiv ? 40 : 28,
+                      height: aktiv ? 40 : 28,
+                      borderRadius: '50%',
+                      color: aktiv || erledigt ? '#fff' : theme.palette.text.secondary,
+                      backgroundColor: farbe,
+                      transition: 'all 120ms ease-in-out',
+                      fontSize: aktiv ? 14 : 12,
+                      fontWeight: 600,
+                      boxShadow: aktiv ? 4 : 0,
+                      '&:hover': {
+                        filter: 'brightness(1.05)',
+                      },
+                      '&:focus-visible': {
+                        outline: `2px solid ${theme.palette.primary.main}`,
+                        outlineOffset: 2,
+                      },
+                    }}
+                  >
+                    {erledigt && !aktiv ? <CheckIcon fontSize="small" /> : kurzInhalt(step)}
+                  </Box>
+                </Tooltip>
+              </Box>
               <Typography
                 variant="caption"
                 sx={{
@@ -129,6 +140,12 @@ export function FortschrittStepper({
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   maxWidth: '100%',
+                  // feste Höhe, damit das Layout darunter beim Wechsel des aktiven Steps nicht springt
+                  minHeight: 32,
+                  lineHeight: 1.2,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
                 }}
               >
                 {labelText}

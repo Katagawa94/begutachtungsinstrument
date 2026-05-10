@@ -54,4 +54,11 @@ describe('Modul-Definitionen', () => {
     expect(() => getModul(99)).toThrow();
     expect(() => getKriterium('9.9')).toThrow();
   });
+
+  it('versorgt jedes Kriterium mit einer offiziellen Beschreibung', () => {
+    for (const k of ALLE_KRITERIEN) {
+      expect(k.beschreibung, `Beschreibung fehlt für Kriterium ${k.id}`).toBeDefined();
+      expect(k.beschreibung!.length).toBeGreaterThan(20);
+    }
+  });
 });

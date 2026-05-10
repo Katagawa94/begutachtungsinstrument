@@ -162,6 +162,8 @@ const styles = StyleSheet.create({
     width: '20%',
     fontSize: 8,
     color: colors.muted,
+  },
+  kriteriumKommentarText: {
     fontStyle: 'italic',
   },
   modulSubtotal: {
@@ -395,7 +397,9 @@ function KriteriumZeile({ k }: { k: PdfKriterium }) {
       <Text style={[styles.kriteriumPunkte, nichtBewertet ? styles.ausgegraut : {}]}>
         {nichtBewertet ? '–' : k.punkte}
       </Text>
-      <Text style={styles.kriteriumKommentar}>{k.kommentar || ''}</Text>
+      <Text style={[styles.kriteriumKommentar, k.kommentar ? styles.kriteriumKommentarText : {}]}>
+        {k.kommentar || ''}
+      </Text>
     </View>
   );
 }

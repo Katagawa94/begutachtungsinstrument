@@ -1,3 +1,4 @@
+import { KRITERIEN_BESCHREIBUNGEN } from './kriterienBeschreibungen';
 import type { Kriterium, Modul, SkalenStufe } from './types';
 
 const STUFEN_SELBSTSTAENDIGKEIT: SkalenStufe[] = [
@@ -219,7 +220,24 @@ const MODUL_6: Modul = {
   ],
 };
 
-export const MODULE: readonly Modul[] = [MODUL_1, MODUL_2, MODUL_3, MODUL_4, MODUL_5, MODUL_6];
+function withBeschreibungen(modul: Modul): Modul {
+  return {
+    ...modul,
+    kriterien: modul.kriterien.map((k) => {
+      const beschreibung = KRITERIEN_BESCHREIBUNGEN[k.id];
+      return beschreibung ? { ...k, beschreibung } : k;
+    }),
+  };
+}
+
+export const MODULE: readonly Modul[] = [
+  MODUL_1,
+  MODUL_2,
+  MODUL_3,
+  MODUL_4,
+  MODUL_5,
+  MODUL_6,
+].map(withBeschreibungen);
 
 export const MODUL_BY_ID: Record<number, Modul> = Object.fromEntries(
   MODULE.map((m) => [m.id, m]),

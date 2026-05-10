@@ -10,7 +10,7 @@ import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
-import type { Bewertung, Kriterium } from '../domain/types';
+import type { Bewertung, Kriterium, SkalenStufe } from '../domain/types';
 
 type Props = {
   kriterium: Kriterium;
@@ -26,26 +26,28 @@ export function KriteriumCard({ kriterium, bewertung, onChange }: Props) {
   return (
     <Card variant="outlined">
       <CardContent>
-        <Stack spacing={2}>
-          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+        <Stack spacing={1.5}>
+          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, flexWrap: 'wrap' }}>
             <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 600 }}>
               {kriterium.id}
             </Typography>
-            <Typography id={labelId} variant="subtitle1" sx={{ fontWeight: 500 }}>
+            <Typography id={labelId} variant="subtitle1" sx={{ fontWeight: 500, flexGrow: 1 }}>
               {kriterium.bezeichnung}
             </Typography>
             {kriterium.faktor && kriterium.faktor !== 1 ? (
               <Tooltip title={`Punkte werden mit Faktor ${kriterium.faktor} multipliziert`}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ ml: 'auto', flexShrink: 0 }}
-                >
+                <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
                   ×{kriterium.faktor}
                 </Typography>
               </Tooltip>
             ) : null}
           </Box>
+
+          {kriterium.beschreibung ? (
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+              {kriterium.beschreibung}
+            </Typography>
+          ) : null}
 
           {kriterium.skala.art === 'ordinal' ? (
             <OrdinalAuswahl
@@ -89,11 +91,19 @@ function OrdinalAuswahl({
 }: {
   labelId: string;
   wert: number | null;
-  stufen: { wert: number; label: string; hinweis?: string }[];
+  stufen: SkalenStufe[];
   onChange: (wert: number | null) => void;
 }) {
+  const ausgewaehlteStufe = stufen.find((s) => s.wert === wert) ?? null;
   return (
-    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack
+      direction="row"
+      spacing={2}
+      alignItems="center"
+      flexWrap="wrap"
+      useFlexGap
+      sx={{ rowGap: 1 }}
+    >
       <ToggleButtonGroup
         aria-labelledby={labelId}
         value={wert}
@@ -102,32 +112,38 @@ function OrdinalAuswahl({
         onChange={(_event, neu) => onChange(neu)}
       >
         {stufen.map((stufe) => (
-          <ToggleButton key={stufe.wert} value={stufe.wert} sx={{ px: 2 }}>
-            <Stack alignItems="center" spacing={0} sx={{ lineHeight: 1.1 }}>
-              <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-                {stufe.wert}
-              </Typography>
-              <Typography
-                variant="caption"
-                component="span"
-                sx={{ textTransform: 'none', whiteSpace: 'normal', textAlign: 'center' }}
-              >
-                {stufe.label}
-              </Typography>
-              {stufe.hinweis ? (
-                <Typography
-                  variant="caption"
-                  component="span"
-                  color="text.secondary"
-                  sx={{ textTransform: 'none', fontSize: 11 }}
-                >
-                  ({stufe.hinweis})
-                </Typography>
-              ) : null}
-            </Stack>
-          </ToggleButton>
+          <Tooltip
+            key={stufe.wert}
+            title={stufe.hinweis ? `${stufe.label} (${stufe.hinweis})` : stufe.label}
+            placement="top"
+          >
+            <ToggleButton value={stufe.wert} sx={{ minWidth: 40, px: 1.5, fontWeight: 600 }}>
+              {stufe.wert}
+            </ToggleButton>
+          </Tooltip>
         ))}
       </ToggleButtonGroup>
+
+      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+        {ausgewaehlteStufe ? (
+          <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ flexWrap: 'wrap' }}>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {ausgewaehlteStufe.wert} —
+            </Typography>
+            <Typography variant="body2">{ausgewaehlteStufe.label}</Typography>
+            {ausgewaehlteStufe.hinweis ? (
+              <Typography variant="caption" color="text.secondary">
+                ({ausgewaehlteStufe.hinweis})
+              </Typography>
+            ) : null}
+          </Stack>
+        ) : (
+          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            nicht bewertet
+          </Typography>
+        )}
+      </Box>
+
       {wert !== null ? (
         <Tooltip title="Bewertung zurücksetzen">
           <IconButton size="small" aria-label="Bewertung zurücksetzen" onClick={() => onChange(null)}>
@@ -154,28 +170,37 @@ function FrequenzEingabe({
 }) {
   return (
     <Stack spacing={1}>
-      <TextField
-        type="number"
-        size="small"
-        slotProps={{
-          input: { inputProps: { min: 0, max, step: 1, 'aria-labelledby': labelId } },
-        }}
-        sx={{ maxWidth: 200 }}
-        value={wert ?? ''}
-        onChange={(e) => {
-          const raw = e.target.value;
-          if (raw === '') {
-            onChange(null);
-            return;
-          }
-          const zahl = Number(raw);
-          if (Number.isNaN(zahl)) return;
-          const begrenzt = Math.max(0, Math.min(max, Math.round(zahl)));
-          onChange(begrenzt);
-        }}
-        helperText={`Punktwert (0–${max})`}
-        label="Einzelpunkte"
-      />
+      <Stack direction="row" spacing={2} alignItems="center" useFlexGap>
+        <TextField
+          type="number"
+          size="small"
+          slotProps={{
+            input: { inputProps: { min: 0, max, step: 1, 'aria-labelledby': labelId } },
+          }}
+          sx={{ maxWidth: 200 }}
+          value={wert ?? ''}
+          onChange={(e) => {
+            const raw = e.target.value;
+            if (raw === '') {
+              onChange(null);
+              return;
+            }
+            const zahl = Number(raw);
+            if (Number.isNaN(zahl)) return;
+            const begrenzt = Math.max(0, Math.min(max, Math.round(zahl)));
+            onChange(begrenzt);
+          }}
+          helperText={`Punktwert (0–${max})`}
+          label="Einzelpunkte"
+        />
+        <Typography
+          variant="body2"
+          color={wert === null ? 'text.secondary' : 'text.primary'}
+          sx={{ fontStyle: wert === null ? 'italic' : 'normal' }}
+        >
+          {wert === null ? 'nicht bewertet' : `${wert} Punkte`}
+        </Typography>
+      </Stack>
       <Typography variant="caption" color="text.secondary">
         {hinweis}
       </Typography>
