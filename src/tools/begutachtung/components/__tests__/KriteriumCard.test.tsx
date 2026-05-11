@@ -21,6 +21,18 @@ describe('KriteriumCard', () => {
     expect(screen.getByText(/überwiegend unselbstständig/i)).toBeInTheDocument();
   });
 
+  it('zeigt die Stufen-Beschreibung des aktuell gewählten Werts an', () => {
+    render(
+      <KriteriumCard
+        kriterium={getKriterium('1.1')}
+        bewertung={{ wert: 3, kommentar: '' }}
+        onChange={vi.fn()}
+      />,
+    );
+    // Beschreibung zu 1.1 / Wert 3 enthält "vollständig durch Pflegepersonen"
+    expect(screen.getByText(/Pflegepersonen/i)).toBeInTheDocument();
+  });
+
   it('ruft onChange mit dem ausgewählten ordinalen Wert auf', async () => {
     const onChange = vi.fn();
     render(<KriteriumCard kriterium={getKriterium('1.1')} bewertung={undefined} onChange={onChange} />);

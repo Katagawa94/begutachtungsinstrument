@@ -120,60 +120,80 @@ function OrdinalAuswahl({
 }) {
   const ausgewaehlteStufe = stufen.find((s) => s.wert === wert) ?? null;
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      flexWrap="wrap"
-      useFlexGap
-      sx={{ rowGap: 1 }}
-    >
-      <ToggleButtonGroup
-        aria-labelledby={labelId}
-        value={wert}
-        exclusive
-        size="small"
-        onChange={(_event, neu) => onChange(neu)}
+    <Stack spacing={1.25}>
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        flexWrap="wrap"
+        useFlexGap
+        sx={{ rowGap: 1 }}
       >
-        {stufen.map((stufe) => (
-          <Tooltip
-            key={stufe.wert}
-            title={stufe.hinweis ? `${stufe.label} (${stufe.hinweis})` : stufe.label}
-            placement="top"
-          >
-            <ToggleButton value={stufe.wert} sx={{ minWidth: 40, px: 1.5, fontWeight: 600 }}>
-              {stufe.wert}
-            </ToggleButton>
-          </Tooltip>
-        ))}
-      </ToggleButtonGroup>
+        <ToggleButtonGroup
+          aria-labelledby={labelId}
+          value={wert}
+          exclusive
+          size="small"
+          onChange={(_event, neu) => onChange(neu)}
+        >
+          {stufen.map((stufe) => (
+            <Tooltip
+              key={stufe.wert}
+              title={stufe.hinweis ? `${stufe.label} (${stufe.hinweis})` : stufe.label}
+              placement="top"
+            >
+              <ToggleButton value={stufe.wert} sx={{ minWidth: 40, px: 1.5, fontWeight: 600 }}>
+                {stufe.wert}
+              </ToggleButton>
+            </Tooltip>
+          ))}
+        </ToggleButtonGroup>
 
-      <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-        {ausgewaehlteStufe ? (
-          <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ flexWrap: 'wrap' }}>
-            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-              {ausgewaehlteStufe.wert} —
-            </Typography>
-            <Typography variant="body2">{ausgewaehlteStufe.label}</Typography>
-            {ausgewaehlteStufe.hinweis ? (
-              <Typography variant="caption" color="text.secondary">
-                ({ausgewaehlteStufe.hinweis})
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          {ausgewaehlteStufe ? (
+            <Stack direction="row" spacing={0.5} alignItems="baseline" sx={{ flexWrap: 'wrap' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {ausgewaehlteStufe.wert} —
               </Typography>
-            ) : null}
-          </Stack>
-        ) : (
-          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-            nicht bewertet
-          </Typography>
-        )}
-      </Box>
+              <Typography variant="body2">{ausgewaehlteStufe.label}</Typography>
+              {ausgewaehlteStufe.hinweis ? (
+                <Typography variant="caption" color="text.secondary">
+                  ({ausgewaehlteStufe.hinweis})
+                </Typography>
+              ) : null}
+            </Stack>
+          ) : (
+            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+              nicht bewertet
+            </Typography>
+          )}
+        </Box>
 
-      {wert !== null ? (
-        <Tooltip title="Bewertung zurücksetzen">
-          <IconButton size="small" aria-label="Bewertung zurücksetzen" onClick={() => onChange(null)}>
-            <ClearIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {wert !== null ? (
+          <Tooltip title="Bewertung zurücksetzen">
+            <IconButton size="small" aria-label="Bewertung zurücksetzen" onClick={() => onChange(null)}>
+              <ClearIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : null}
+      </Stack>
+
+      {ausgewaehlteStufe?.beschreibung ? (
+        <Box
+          role="note"
+          sx={(theme) => ({
+            px: 1.5,
+            py: 1,
+            borderRadius: 1,
+            bgcolor: theme.palette.mode === 'dark' ? 'action.hover' : 'grey.50',
+            borderLeft: 3,
+            borderColor: 'primary.main',
+          })}
+        >
+          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+            {ausgewaehlteStufe.beschreibung}
+          </Typography>
+        </Box>
       ) : null}
     </Stack>
   );

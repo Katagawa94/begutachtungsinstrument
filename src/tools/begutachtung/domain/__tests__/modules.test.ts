@@ -61,4 +61,30 @@ describe('Modul-Definitionen', () => {
       expect(k.beschreibung!.length).toBeGreaterThan(20);
     }
   });
+
+  it('versorgt jede Stufe ordinaler Kriterien mit einer eigenen Beschreibung', () => {
+    for (const k of ALLE_KRITERIEN) {
+      if (k.skala.art !== 'ordinal') continue;
+      for (const stufe of k.skala.stufen) {
+        expect(
+          stufe.beschreibung,
+          `Stufen-Beschreibung fehlt für ${k.id} = ${stufe.wert}`,
+        ).toBeDefined();
+        expect(stufe.beschreibung!.length).toBeGreaterThan(10);
+      }
+    }
+  });
+
+  it('verwendet bei Modul 3 die gemeinsame Häufigkeitsbeschreibung für alle Kriterien', () => {
+    const modul3 = MODULE.find((m) => m.id === 3)!;
+    const text0 = (modul3.kriterien[0]!.skala as { stufen: { wert: number; beschreibung?: string }[] }).stufen.find(
+      (s) => s.wert === 0,
+    )?.beschreibung;
+    expect(text0).toBeDefined();
+    for (const k of modul3.kriterien) {
+      if (k.skala.art !== 'ordinal') continue;
+      const stufe = k.skala.stufen.find((s) => s.wert === 0);
+      expect(stufe?.beschreibung).toBe(text0);
+    }
+  });
 });

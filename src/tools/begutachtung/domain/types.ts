@@ -14,6 +14,8 @@ export type SkalenStufe = {
   wert: number;
   label: string;
   hinweis?: string;
+  /** Detaillierte Beschreibung dieser Stufe — wird in der UI angezeigt, wenn die Stufe ausgewählt ist. */
+  beschreibung?: string;
 };
 
 /**
