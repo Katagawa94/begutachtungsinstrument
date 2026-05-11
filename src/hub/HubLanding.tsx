@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import { Link as RouterLink } from 'react-router-dom';
 
 type Tool = {
@@ -27,6 +28,15 @@ const tools: Tool[] = [
     to: '/begutachtung',
     status: 'in Arbeit',
     icon: <AssignmentIcon fontSize="large" color="primary" />,
+  },
+  {
+    id: 'anonymisierung',
+    title: 'Anonymisierung',
+    description:
+      'Beliebige Dateien lokal nach Markdown konvertieren und vor der Weitergabe an eine KI anonymisieren.',
+    to: '/anonymisierung',
+    status: 'in Arbeit',
+    icon: <ShieldOutlinedIcon fontSize="large" color="primary" />,
   },
 ];
 

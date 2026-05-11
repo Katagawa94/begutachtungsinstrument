@@ -11,6 +11,7 @@ import { UebersichtPage } from '../tools/begutachtung/pages/UebersichtPage';
 import { StammdatenPage } from '../tools/begutachtung/pages/StammdatenPage';
 import { ModulPage } from '../tools/begutachtung/pages/ModulPage';
 import { AbschlussPage } from '../tools/begutachtung/pages/AbschlussPage';
+import { AnonymisierungPage } from '../tools/anonymisierung/AnonymisierungPage';
 
 export function App() {
   return (
@@ -30,6 +31,7 @@ export function App() {
                   <Route path="abschluss" element={<AbschlussPage />} />
                 </Route>
               </Route>
+              <Route path="anonymisierung" element={<AnonymisierungPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

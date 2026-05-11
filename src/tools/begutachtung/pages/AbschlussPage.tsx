@@ -19,7 +19,7 @@ import { MODULE } from '../domain/modules';
 import { buildPdfData } from '../pdf/pdfData';
 import { downloadBegutachtungPdf } from '../pdf/download';
 import { exportiereAlsJson } from '../state/storage';
-import { downloadAlsDatei } from '../utils/download';
+import { downloadAlsDatei } from '../../../shared/download';
 import { downloadDateinameFuer, formatDate } from '../utils/format';
 
 export function AbschlussPage() {

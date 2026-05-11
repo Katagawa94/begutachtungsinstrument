@@ -35,7 +35,7 @@ import {
 } from '../state/storage';
 import { berechneFortschritt, berechneGesamtergebnis } from '../domain/scoring';
 import { bezeichnungFuer, downloadDateinameFuer, formatDateTime } from '../utils/format';
-import { downloadAlsDatei, leseDateiAlsText } from '../utils/download';
+import { downloadAlsDatei, leseDateiAlsText } from '../../../shared/download';
 
 export function UebersichtPage() {
   const { begutachtungen, erstellen, erstelleBeispiel, loeschen, duplizieren, importieren } =
