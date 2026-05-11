@@ -18,3 +18,19 @@ export async function leseDateiAlsText(file: File): Promise<string> {
     reader.readAsText(file, 'utf-8');
   });
 }
+
+export async function kopiereInZwischenablage(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  // Fallback für ältere Browser ohne Clipboard-API
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  ta.remove();
+}
