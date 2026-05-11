@@ -8,7 +8,8 @@ import Step from '@mui/material/Step';
 import StepButton from '@mui/material/StepButton';
 import StepLabel from '@mui/material/StepLabel';
 import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
-import { styled, alpha } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import FlagRoundedIcon from '@mui/icons-material/FlagRounded';
@@ -61,7 +62,8 @@ const StepIconRoot = styled('div', {
     justifyContent: 'center',
     fontWeight: 700,
     fontSize: 13,
-    transition: 'background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease',
+    transition:
+      'background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease',
     color: theme.palette.text.secondary,
     backgroundColor:
       theme.palette.mode === 'dark' ? alpha(theme.palette.text.primary, 0.08) : '#fff',
@@ -108,7 +110,11 @@ export function FortschrittStepper({
   stammdatenVollstaendig,
 }: Props) {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const kompakt = useMediaQuery(theme.breakpoints.down('sm'));
   const fortschritt = berechneFortschritt(bewertungen);
+  const aktiverIndex = activeIndex < 0 ? 0 : activeIndex;
+  const aktiverStep = steps[aktiverIndex];
 
   function istErledigt(step: PsvStep): boolean {
     if (step.kind === 'stammdaten') return stammdatenVollstaendig;
@@ -124,42 +130,56 @@ export function FortschrittStepper({
       aria-label="Begutachtungsfortschritt"
       sx={{ width: '100%', mb: 3, mt: 1 }}
     >
-      <Stepper
-        alternativeLabel
-        activeStep={activeIndex < 0 ? 0 : activeIndex}
-        connector={<Connector />}
-        nonLinear
-      >
-        {steps.map((step) => {
-          const erledigt = istErledigt(step);
-          return (
-            <Step key={step.pfad} completed={erledigt}>
-              <StepButton onClick={() => navigate(step.pfad)}>
-                <StepLabel
-                  slots={{ stepIcon: makeStepIcon(step) }}
-                  sx={{
-                    '& .MuiStepLabel-label': {
-                      mt: 1,
-                      fontSize: 12,
-                      minHeight: 32,
-                      lineHeight: 1.25,
-                    },
-                    '& .MuiStepLabel-label.Mui-active': {
-                      fontWeight: 600,
-                      color: 'text.primary',
-                    },
-                    '& .MuiStepLabel-label.Mui-completed': {
-                      color: 'text.secondary',
-                    },
-                  }}
+      {kompakt && aktiverStep ? (
+        <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
+          Schritt {aktiverIndex + 1} von {steps.length}: {aktiverStep.label}
+        </Typography>
+      ) : null}
+
+      <Box sx={{ overflowX: 'auto', pb: kompakt ? 0.5 : 0 }}>
+        <Stepper
+          alternativeLabel
+          activeStep={aktiverIndex}
+          connector={<Connector />}
+          nonLinear
+          sx={{ minWidth: kompakt ? steps.length * 38 : undefined }}
+        >
+          {steps.map((step, index) => {
+            const erledigt = istErledigt(step);
+            const istAktiv = index === aktiverIndex;
+            return (
+              <Step key={step.pfad} completed={erledigt}>
+                <StepButton
+                  onClick={() => navigate(step.pfad)}
+                  aria-current={istAktiv ? 'step' : undefined}
+                  aria-label={`${step.label}${erledigt ? ' (abgeschlossen)' : ''}`}
                 >
-                  {labelFuer(step)}
-                </StepLabel>
-              </StepButton>
-            </Step>
-          );
-        })}
-      </Stepper>
+                  <StepLabel
+                    slots={{ stepIcon: makeStepIcon(step) }}
+                    sx={{
+                      '& .MuiStepLabel-label': {
+                        mt: kompakt ? 0 : 1,
+                        fontSize: 12,
+                        minHeight: kompakt ? 0 : 32,
+                        lineHeight: 1.25,
+                      },
+                      '& .MuiStepLabel-label.Mui-active': {
+                        fontWeight: 600,
+                        color: 'text.primary',
+                      },
+                      '& .MuiStepLabel-label.Mui-completed': {
+                        color: 'text.secondary',
+                      },
+                    }}
+                  >
+                    {kompakt ? '' : labelFuer(step)}
+                  </StepLabel>
+                </StepButton>
+              </Step>
+            );
+          })}
+        </Stepper>
+      </Box>
 
       <Stack
         direction="row"
@@ -170,13 +190,14 @@ export function FortschrittStepper({
         <LinearProgress
           variant="determinate"
           value={fortschritt.prozent}
-          sx={{
-            flexGrow: 1,
-            height: 6,
-            borderRadius: 3,
-          }}
+          aria-label="Gesamtfortschritt der Begutachtung"
+          sx={{ flexGrow: 1, height: 6, borderRadius: 3 }}
         />
-        <Typography variant="caption" color="text.secondary" sx={{ minWidth: 96, textAlign: 'right' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ minWidth: 92, textAlign: 'right' }}
+        >
           {fortschritt.bewertet} / {fortschritt.gesamt} Kriterien
         </Typography>
       </Stack>

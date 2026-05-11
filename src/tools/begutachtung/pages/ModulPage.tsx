@@ -94,9 +94,8 @@ export function ModulPage() {
         elevation={6}
         sx={{
           position: 'sticky',
-          bottom: 16,
+          bottom: { xs: 8, sm: 16 },
           p: 2,
-          mx: { xs: -1, sm: 0 },
           borderRadius: 2,
           display: 'flex',
           alignItems: 'center',
