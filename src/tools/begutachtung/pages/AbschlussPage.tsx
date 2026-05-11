@@ -113,7 +113,7 @@ export function AbschlussPage() {
       </Paper>
 
       <Paper variant="outlined" sx={{ p: 3 }}>
-        <Typography variant="h3" sx={{ mb: 2 }}>
+        <Typography variant="h3" component="h2" sx={{ mb: 2 }}>
           Modulübersicht
         </Typography>
         <Stack divider={<Divider />}>
@@ -154,7 +154,7 @@ export function AbschlussPage() {
 
       {kommentare.length > 0 ? (
         <Paper variant="outlined" sx={{ p: 3 }}>
-          <Typography variant="h3" sx={{ mb: 2 }}>
+          <Typography variant="h3" component="h2" sx={{ mb: 2 }}>
             Kommentare ({kommentare.length})
           </Typography>
           <Stack spacing={1.5}>

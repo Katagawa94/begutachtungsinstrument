@@ -65,7 +65,7 @@ export function StammdatenPage() {
       </Box>
 
       <Paper variant="outlined" sx={{ p: 3 }}>
-        <Typography variant="h3" sx={{ mb: 2 }}>
+        <Typography variant="h3" component="h2" sx={{ mb: 2 }}>
           Begutachtete Person
         </Typography>
         <Grid container spacing={2}>
@@ -92,7 +92,7 @@ export function StammdatenPage() {
       </Paper>
 
       <Paper variant="outlined" sx={{ p: 3 }}>
-        <Typography variant="h3" sx={{ mb: 2 }}>
+        <Typography variant="h3" component="h2" sx={{ mb: 2 }}>
           Gutachter:in
         </Typography>
         <TextField
@@ -105,7 +105,7 @@ export function StammdatenPage() {
       </Paper>
 
       <Paper variant="outlined" sx={{ p: 3 }}>
-        <Typography variant="h3" sx={{ mb: 2 }}>
+        <Typography variant="h3" component="h2" sx={{ mb: 2 }}>
           Begutachtungstermin
         </Typography>
         <Grid container spacing={2}>
@@ -132,7 +132,7 @@ export function StammdatenPage() {
       </Paper>
 
       <Paper variant="outlined" sx={{ p: 3 }}>
-        <Typography variant="h3" sx={{ mb: 2 }}>
+        <Typography variant="h3" component="h2" sx={{ mb: 2 }}>
           Pflegekasse
         </Typography>
         <Grid container spacing={2}>
@@ -157,7 +157,11 @@ export function StammdatenPage() {
         </Grid>
       </Paper>
 
-      <Stack direction="row" spacing={2}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={2}
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+      >
         <Button component={RouterLink} to="/begutachtung" variant="outlined">
           Zur Übersicht
         </Button>
