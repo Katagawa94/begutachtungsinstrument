@@ -1,4 +1,5 @@
 import { KRITERIEN_BESCHREIBUNGEN } from './kriterienBeschreibungen';
+import { MODUL_3_HAEUFIGKEIT_BESCHREIBUNG, WERT_BESCHREIBUNGEN } from './wertBeschreibungen';
 import type { Kriterium, Modul, Modul5Berechnung, SkalenStufe } from './types';
 
 const STUFEN_SELBSTSTAENDIGKEIT: SkalenStufe[] = [
@@ -251,12 +252,30 @@ const MODUL_6: Modul = {
   ],
 };
 
+function reichereStufenAn(k: Kriterium): Kriterium {
+  if (k.skala.art !== 'ordinal') return k;
+  const proWert = WERT_BESCHREIBUNGEN[k.id];
+  const istModul3 = k.modulId === 3;
+  if (!proWert && !istModul3) return k;
+  const angereicherteStufen = k.skala.stufen.map((stufe) => {
+    const text = proWert?.[stufe.wert] ?? (istModul3 ? MODUL_3_HAEUFIGKEIT_BESCHREIBUNG[stufe.wert] : undefined);
+    return text ? { ...stufe, beschreibung: text } : stufe;
+  });
+  return {
+    ...k,
+    skala: { art: 'ordinal', stufen: angereicherteStufen },
+  };
+}
+
 function withBeschreibungen(modul: Modul): Modul {
   return {
     ...modul,
     kriterien: modul.kriterien.map((k) => {
-      const beschreibung = KRITERIEN_BESCHREIBUNGEN[k.id];
-      return beschreibung ? { ...k, beschreibung } : k;
+      const themaBeschreibung = KRITERIEN_BESCHREIBUNGEN[k.id];
+      const mitStufen = reichereStufenAn(k);
+      return themaBeschreibung
+        ? { ...mitStufen, beschreibung: themaBeschreibung }
+        : mitStufen;
     }),
   };
 }
