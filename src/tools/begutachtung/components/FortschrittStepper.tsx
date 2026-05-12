@@ -136,7 +136,15 @@ export function FortschrittStepper({
         </Typography>
       ) : null}
 
-      <Box sx={{ overflowX: 'auto', pb: kompakt ? 0.5 : 0 }}>
+      <Box
+        sx={{
+          // Auf schmalen Viewports darf horizontal gescrollt werden; auf dem
+          // Desktop soll nichts überlaufen (sonst erscheinen Scrollbalken durch
+          // den Halo-Ring des aktiven Schritts / die Connector-Berechnung).
+          overflowX: kompakt ? 'auto' : 'visible',
+          pb: kompakt ? 0.5 : 0,
+        }}
+      >
         <Stepper
           alternativeLabel
           activeStep={aktiverIndex}

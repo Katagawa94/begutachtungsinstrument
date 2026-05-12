@@ -37,7 +37,7 @@ export function AppShell() {
       >
         Zum Hauptinhalt springen
       </Link>
-      <AppBar position="sticky" color="default" enableColorOnDark>
+      <AppBar position="sticky" elevation={0}>
         <Toolbar sx={{ gap: 1 }}>
           <Typography
             component={RouterLink}
@@ -80,6 +80,7 @@ export function AppShell() {
           textAlign: 'center',
           color: 'text.secondary',
           fontSize: 14,
+          bgcolor: 'background.paper',
           borderTop: 1,
           borderColor: 'divider',
         }}
