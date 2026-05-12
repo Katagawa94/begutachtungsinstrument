@@ -45,15 +45,40 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
       createTheme({
         palette: {
           mode,
-          primary: { main: '#1976d2' },
-          secondary: { main: '#7e57c2' },
+          primary: { main: mode === 'dark' ? '#5b8def' : '#2456d6' },
+          secondary: { main: mode === 'dark' ? '#34c2b3' : '#0f8a7e' },
+          background:
+            mode === 'dark'
+              ? { default: '#0f1620', paper: '#18202c' }
+              : { default: '#eef2f8', paper: '#ffffff' },
+          divider: mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(15,30,55,0.12)',
         },
-        shape: { borderRadius: 10 },
+        shape: { borderRadius: 12 },
         typography: {
           fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
           h1: { fontSize: '2rem', fontWeight: 600 },
           h2: { fontSize: '1.6rem', fontWeight: 600 },
           h3: { fontSize: '1.3rem', fontWeight: 600 },
+        },
+        components: {
+          MuiAppBar: {
+            defaultProps: { color: 'primary', enableColorOnDark: true },
+            styleOverrides: {
+              colorPrimary: {
+                backgroundImage:
+                  mode === 'dark'
+                    ? 'linear-gradient(90deg, #1f3a6b 0%, #2456d6 100%)'
+                    : 'linear-gradient(90deg, #1d4fc4 0%, #2c6ae0 100%)',
+              },
+            },
+          },
+          MuiPaper: {
+            styleOverrides: {
+              outlined: ({ theme: t }) => ({
+                borderColor: t.palette.divider,
+              }),
+            },
+          },
         },
       }),
     [mode],
