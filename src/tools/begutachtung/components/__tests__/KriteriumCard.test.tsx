@@ -85,6 +85,32 @@ describe('KriteriumCard', () => {
     expect(screen.getByLabelText(/Pro Monat/i)).toBeInTheDocument();
   });
 
+  it('behandelt eine explizit eingetragene 0 als Bewertung (wert 0, nicht null)', async () => {
+    const onChange = vi.fn();
+    render(
+      <KriteriumCard
+        kriterium={getKriterium('5.13')}
+        bewertung={undefined}
+        onChange={onChange}
+      />,
+    );
+    await userEvent.type(screen.getByLabelText(/Pro Monat/i), '0');
+    expect(onChange.mock.calls.at(-1)?.[0]).toEqual({ wert: 0, frequenz: { monat: 0 } });
+  });
+
+  it('setzt die Häufigkeit über den Reset-Button zurück', async () => {
+    const onChange = vi.fn();
+    render(
+      <KriteriumCard
+        kriterium={getKriterium('5.1')}
+        bewertung={{ wert: 3, kommentar: '', frequenz: { tag: 3 } }}
+        onChange={onChange}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /Häufigkeit zurücksetzen/i }));
+    expect(onChange).toHaveBeenCalledWith({ wert: null, frequenz: undefined });
+  });
+
   it('zeigt einen Ja/Nein-Schalter für Diät-Kriterium 5.16', () => {
     const onChange = vi.fn();
     render(

@@ -100,13 +100,18 @@ describe('berechneModul5Punkte – jaNein (5.16)', () => {
 });
 
 describe('istLeere', () => {
-  it('ist true bei undefined oder rein zerologischer Eingabe', () => {
+  it('ist true nur, wenn kein Häufigkeitsfeld gesetzt ist', () => {
     expect(istLeere(undefined)).toBe(true);
     expect(istLeere({})).toBe(true);
-    expect(istLeere({ tag: 0, woche: 0, monat: 0 })).toBe(true);
   });
 
-  it('ist false sobald irgendein Feld gesetzt ist', () => {
+  it('behandelt eine explizit eingetragene 0 als Bewertung (nicht leer)', () => {
+    expect(istLeere({ tag: 0 })).toBe(false);
+    expect(istLeere({ tag: 0, woche: 0, monat: 0 })).toBe(false);
+    expect(istLeere({ monat: 0 })).toBe(false);
+  });
+
+  it('ist false, sobald irgendein Feld gesetzt ist', () => {
     expect(istLeere({ tag: 1 })).toBe(false);
     expect(istLeere({ jaNein: true })).toBe(false);
   });

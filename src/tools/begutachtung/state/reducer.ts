@@ -76,9 +76,9 @@ export function reducer(state: State, action: Action): State {
         const frequenzLeer =
           !neuFrequenz ||
           (neuFrequenz.jaNein !== true &&
-            !neuFrequenz.tag &&
-            !neuFrequenz.woche &&
-            !neuFrequenz.monat);
+            neuFrequenz.tag === undefined &&
+            neuFrequenz.woche === undefined &&
+            neuFrequenz.monat === undefined);
         if (neuWert === null && neuKommentar === '' && frequenzLeer) {
           const { [action.kriteriumId]: _entfernt, ...rest } = b.bewertungen;
           void _entfernt;

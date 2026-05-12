@@ -49,10 +49,17 @@ export function tagesaequivalent(eingabe: Modul5Eingabe): number {
   );
 }
 
+/**
+ * Eine Eingabe gilt nur dann als "leer" (= Kriterium nicht bewertet), wenn
+ * keines der Häufigkeitsfelder gesetzt ist. Eine explizit eingetragene 0 zählt
+ * als Bewertung — Modul-5-Kriterien können bewusst mit 0 Punkten bewertet sein.
+ */
 export function istLeere(eingabe: Modul5Eingabe | undefined): boolean {
   if (!eingabe) return true;
   if (eingabe.jaNein === true) return false;
-  return !eingabe.tag && !eingabe.woche && !eingabe.monat;
+  return (
+    eingabe.tag === undefined && eingabe.woche === undefined && eingabe.monat === undefined
+  );
 }
 
 function clamp(wert: number, min: number, max: number): number {
