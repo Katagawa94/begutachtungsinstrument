@@ -138,6 +138,22 @@ describe('reducer', () => {
     expect(next.begutachtungen[0]?.bewertungen).toEqual({});
   });
 
+  it('bewertungSetzen behält eine Modul-5-Bewertung mit explizit eingetragener 0', () => {
+    const a = neueBegutachtung('a', T1);
+    const next = reducer(stateMit(a), {
+      type: 'bewertungSetzen',
+      id: 'a',
+      kriteriumId: '5.1',
+      bewertung: { wert: 0, frequenz: { tag: 0 } },
+      jetzt: T2,
+    });
+    expect(next.begutachtungen[0]?.bewertungen['5.1']).toEqual({
+      wert: 0,
+      kommentar: '',
+      frequenz: { tag: 0 },
+    });
+  });
+
   it('duplizieren erzeugt eine unabhängige Kopie mit neuer ID', () => {
     const start: Begutachtung = {
       ...neueBegutachtung('a', T1),

@@ -12,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import ClearIcon from '@mui/icons-material/Clear';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import type {
   Bewertung,
   Kriterium,
@@ -234,6 +235,23 @@ function Modul5Kalkulator({
     onChange(naechste);
   }
 
+  function Zuruecksetzen() {
+    return (
+      <Tooltip title="Häufigkeit zurücksetzen (Kriterium gilt dann als nicht bewertet)">
+        <span>
+          <IconButton
+            aria-label="Häufigkeit zurücksetzen"
+            onClick={() => onChange(null)}
+            disabled={eingabeLeer}
+            sx={{ mt: 0.25 }}
+          >
+            <RestartAltIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+    );
+  }
+
   return (
     <Stack spacing={1.5} aria-labelledby={labelId}>
       {berechnung.art === 'jaNein' ? (
@@ -247,14 +265,17 @@ function Modul5Kalkulator({
           label="Erforderlich"
         />
       ) : berechnung.art === 'monatlich' ? (
-        <ZahlEingabe
-          label="Pro Monat"
-          value={frequenz?.monat}
-          max={300}
-          onChange={(monat) => setze({ monat })}
-        />
+        <Stack direction="row" spacing={1.5} alignItems="flex-start" useFlexGap flexWrap="wrap">
+          <ZahlEingabe
+            label="Pro Monat"
+            value={frequenz?.monat}
+            max={300}
+            onChange={(monat) => setze({ monat })}
+          />
+          <Zuruecksetzen />
+        </Stack>
       ) : (
-        <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={1.5} alignItems="flex-start" flexWrap="wrap" useFlexGap>
           <ZahlEingabe
             label="Pro Tag"
             value={frequenz?.tag}
@@ -273,6 +294,7 @@ function Modul5Kalkulator({
             max={300}
             onChange={(monat) => setze({ monat })}
           />
+          <Zuruecksetzen />
         </Stack>
       )}
 
@@ -299,17 +321,6 @@ function Modul5Kalkulator({
         <Typography variant="caption" color="text.secondary" sx={{ flexGrow: 1 }}>
           {hinweis}
         </Typography>
-        {!eingabeLeer ? (
-          <Tooltip title="Eingabe zurücksetzen">
-            <IconButton
-              size="small"
-              aria-label="Eingabe zurücksetzen"
-              onClick={() => onChange(null)}
-            >
-              <ClearIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        ) : null}
       </Stack>
     </Stack>
   );
