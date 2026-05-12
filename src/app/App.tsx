@@ -12,6 +12,8 @@ import { StammdatenPage } from '../tools/begutachtung/pages/StammdatenPage';
 import { ModulPage } from '../tools/begutachtung/pages/ModulPage';
 import { AbschlussPage } from '../tools/begutachtung/pages/AbschlussPage';
 import { AnonymisierungPage } from '../tools/anonymisierung/AnonymisierungPage';
+import { AssistentSkillsProvider } from '../tools/assistent/state/AssistentSkillsProvider';
+import { AssistentPage } from '../tools/assistent/AssistentPage';
 
 export function App() {
   return (
@@ -32,6 +34,14 @@ export function App() {
                 </Route>
               </Route>
               <Route path="anonymisierung" element={<AnonymisierungPage />} />
+              <Route
+                path="assistent"
+                element={
+                  <AssistentSkillsProvider>
+                    <AssistentPage />
+                  </AssistentSkillsProvider>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
