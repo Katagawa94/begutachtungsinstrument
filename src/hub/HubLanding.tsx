@@ -10,9 +10,10 @@ import Chip from '@mui/material/Chip';
 import { alpha } from '@mui/material/styles';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { Link as RouterLink } from 'react-router-dom';
 
-type Akzent = 'primary' | 'secondary';
+type Akzent = 'primary' | 'secondary' | 'success';
 
 type Tool = {
   id: string;
@@ -44,6 +45,16 @@ const tools: Tool[] = [
     status: 'in Arbeit',
     icon: <ShieldOutlinedIcon fontSize="large" />,
     akzent: 'secondary',
+  },
+  {
+    id: 'assistent',
+    title: 'Textassistent',
+    description:
+      'Lokales Sprachmodell im Browser: aus gespeicherten „Skills" Markdown-Entwürfe erzeugen und als PDF drucken.',
+    to: '/assistent',
+    status: 'in Arbeit',
+    icon: <AutoFixHighIcon fontSize="large" />,
+    akzent: 'success',
   },
 ];
 
